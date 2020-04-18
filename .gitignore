@@ -1,0 +1,3 @@
+images/**/*.jpg
+!images/page 01/01.jpg
+images-test
