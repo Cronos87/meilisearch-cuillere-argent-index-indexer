@@ -5,8 +5,8 @@ from pprint import pprint
 from typing import List
 import pytesseract
 import cv2
-import meilisearch
 from slugify import slugify
+import meilisearch
 from meilisearch import Client
 from meilisearch.index import Index
 
@@ -122,8 +122,10 @@ class CuillereDArgent:
         unordered_recipes = list(filter(None, unordered_recipes))
 
         # Remove non alpha numeric elements
-        unordered_recipes = list(filter(lambda el: el.replace(" ", "").isalnum(),\
-            unordered_recipes))
+        unordered_recipes = list(filter(self.filter_recipes, unordered_recipes))
+
+        # Clean elements
+        unordered_recipes = list(map(self.clean_recipe, unordered_recipes))
 
         # Merge recipe on multiple lines into one line
         recipes: List[str] = []
@@ -214,6 +216,9 @@ class CuillereDArgent:
             # Add the category as third elements
             recipe_parts.append(self.category)
 
+            # Remove leading and trailing whitespaces
+            recipe_parts = list(map(lambda el: el.strip(), recipe_parts))
+
             # Add the recipe to the list to index
             self.recipes.append(recipe_parts)
 
@@ -252,6 +257,38 @@ class CuillereDArgent:
 
         # Print end message
         print("Indexation finished! Enjoy to cook a lot of good recipes :)")
+
+    def filter_recipes(self, recipe: str) -> bool:
+        """
+        Check if the recipe is alphanumeric with some
+        allowed characters.
+
+        Params:
+            recipe: Recipe to filter on.
+        """
+        for char in [" ", ",", "(", ")", "-", "|"]:
+            recipe = recipe.replace(char, "")
+
+        return recipe.isalnum()
+
+    def clean_recipe(self, recipe: str) -> str:
+        """
+        Remove unwanted characters in recipes
+        or correct words no well read.
+
+        Params:
+            recipe: Recipe string to clean.
+        """
+        to_correct = {
+            "|": "",
+            "pates": "pâtes",
+            "PATES": "PÂTES"
+        }
+
+        for old, new in to_correct.items():
+            recipe = recipe.replace(old, new)
+
+        return recipe
 
 
 def main():
