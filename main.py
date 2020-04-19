@@ -126,6 +126,14 @@ class CuillereDArgent:
 
         # Clean elements
         unordered_recipes = list(map(self.clean_recipe, unordered_recipes))
+        unordered_recipes = self.remove_whitespaces(unordered_recipes)
+
+        # Debug info to see what Tesseract read
+        if self.debug:
+            print("-" * 30)
+            print(categories)
+            print(unordered_recipes)
+            sys.exit()
 
         # Merge recipe on multiple lines into one line
         recipes: List[str] = []
@@ -217,7 +225,7 @@ class CuillereDArgent:
             recipe_parts.append(self.category)
 
             # Remove leading and trailing whitespaces
-            recipe_parts = list(map(lambda el: el.strip(), recipe_parts))
+            recipe_parts = self.remove_whitespaces(recipe_parts)
 
             # Add the recipe to the list to index
             self.recipes.append(recipe_parts)
@@ -256,7 +264,8 @@ class CuillereDArgent:
             recipe_index = recipe_index + 1
 
         # Print end message
-        print("Indexation finished! Enjoy to cook a lot of good recipes :)")
+        print(f"Indexing of {total_recipes} recipes finished!"\
+            " Enjoy to cook a lot of good recipes :)")
 
     def filter_recipes(self, recipe: str) -> bool:
         """
@@ -289,6 +298,20 @@ class CuillereDArgent:
             recipe = recipe.replace(old, new)
 
         return recipe
+
+    def remove_whitespaces(self, recipes: List[str]) -> List[str]:
+        """
+        Remove leading and trailing whitespaces
+        from a list.
+
+        Params:
+            recipes: List of recipes to process.
+
+        Returns:
+            The list with elements without
+            leading and trailing whitespaces.
+        """
+        return list(map(lambda el: el.strip(), recipes))
 
 
 def main():
