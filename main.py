@@ -121,12 +121,12 @@ class CuillereDArgent:
         # Remove empty elements in the recipes list
         unordered_recipes = list(filter(None, unordered_recipes))
 
-        # Remove non alpha numeric elements
-        unordered_recipes = list(filter(self.filter_recipes, unordered_recipes))
-
         # Clean elements
         unordered_recipes = list(map(self.clean_recipe, unordered_recipes))
         unordered_recipes = self.remove_whitespaces(unordered_recipes)
+
+        # Remove non alpha numeric elements
+        unordered_recipes = list(filter(self.filter_recipes, unordered_recipes))
 
         # Debug info to see what Tesseract read
         if self.debug:
@@ -275,7 +275,7 @@ class CuillereDArgent:
         Params:
             recipe: Recipe to filter on.
         """
-        for char in [" ", ",", "(", ")", "-", "|"]:
+        for char in [" ", ",", "(", ")", "-", "|", "'"]:
             recipe = recipe.replace(char, "")
 
         return recipe.isalnum()
@@ -290,8 +290,10 @@ class CuillereDArgent:
         """
         to_correct = {
             "|": "",
+            "’": "'",
             "pates": "pâtes",
-            "PATES": "PÂTES"
+            "PATES": "PÂTES",
+            "arrabbiala": "arrabbiata"
         }
 
         for old, new in to_correct.items():
